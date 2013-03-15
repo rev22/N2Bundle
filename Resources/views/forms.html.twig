@@ -1,0 +1,47 @@
+{% spaceless %}
+
+{% macro theLink(item, text) %}
+<a href="{{item.url}}">{{text|default(item.title)}}</a>
+{% endmacro %}
+
+
+{% macro inline_row(form) %}
+<span>
+  {{ form_widget(form) }}
+  {{ form_errors(form) }}
+</span>
+{% endmacro %}
+
+{% macro inline_row_breadcrumb(form) %}
+<span class="breadcrumb-input">
+  {{ form_widget(form) }}
+  {{ form_errors(form) }}
+</span>
+{% endmacro %}
+
+{% macro simple_row(form) %}
+<div>{{ form_errors(form) }}</div>
+<div>{{ form_widget(form) }}</div>
+{% endmacro %}
+
+{% macro bool_row(form) %}
+<div>
+  {{ form_widget(form) }}
+  {{ form_label(form) }}
+  {{ form_errors(form) }}
+</div>
+{% endmacro %}
+
+{% macro button(x) %}
+{% if x.href is defined %}
+<a href="{{x.href}}" class="btn {% if x.class is defined %} {{x.class}}{% endif %}" {% if x.help is defined %} title="{{x.help|trans}}"{% endif %}>{{x.text|trans}}</a>
+{% else %}
+<input {% if x.class is defined %}class="{{x.class}} btn"{% endif %}type=submit value="{{x.text|trans}}" {% if x.help is defined %}title="{{x.help|trans}}"{% endif %}/>
+{% endif %}
+{% endmacro %}
+
+{% macro crea(x) %}{% import _self as forms %}{{forms.button(x|default({})|merge({ text: 'Crea' }))}}{% endmacro %}
+{#{% macro annulla(x) %}{% import _self as forms %}{{forms.button(x|default({})|merge({ text: 'Annulla', href: "/?action=edit", help: 'Annulla tutte le modifiche correnti' }))}}{% endmacro %}#}
+{% macro elimina(x) %}{% import _self as forms %}{{forms.button(x|default({})|merge({ text: 'Elimina' }))}}{% endmacro %}
+
+{% endspaceless %}

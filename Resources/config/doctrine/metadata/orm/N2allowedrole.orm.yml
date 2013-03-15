@@ -1,0 +1,27 @@
+N2allowedrole:
+    type: entity
+    table: n2AllowedRole
+    fields:
+        id:
+            id: true
+            type: integer
+            unsigned: false
+            nullable: false
+            generator:
+                strategy: IDENTITY
+        role:
+            type: string
+            length: 50
+            fixed: false
+            nullable: false
+    manyToOne:
+        itemid:
+            targetEntity: N2item
+            cascade: {  }
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                itemid:
+                    referencedColumnName: id
+            orphanRemoval: true
+    lifecycleCallbacks: {  }

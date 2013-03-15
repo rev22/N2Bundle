@@ -1,0 +1,3 @@
+services:
+    request.user:
+        class: Unislug\N2Bundle\Security\RequestUser

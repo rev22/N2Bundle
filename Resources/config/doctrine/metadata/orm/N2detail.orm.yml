@@ -1,0 +1,71 @@
+N2detail:
+    type: entity
+    table: n2Detail
+    fields:
+        id:
+            id: true
+            type: integer
+            unsigned: false
+            nullable: false
+            generator:
+                strategy: IDENTITY
+        type:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        name:
+            type: string
+            length: 50
+            fixed: false
+            nullable: true
+        boolvalue:
+            type: boolean
+            nullable: true
+        intvalue:
+            type: integer
+            unsigned: false
+            nullable: true
+        doublevalue:
+            type: float
+            nullable: true
+        datetimevalue:
+            type: datetime
+            nullable: true
+        stringvalue:
+            type: string
+            length: 255
+            fixed: false
+            nullable: true
+        value:
+            type: blob
+            nullable: true
+    manyToOne:
+        detailcollectionid:
+            targetEntity: N2detailcollection
+            cascade: {  }
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                detailcollectionid:
+                    referencedColumnName: id
+            orphanRemoval: false
+        itemid:
+            targetEntity: N2item
+            cascade: {  }
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                itemid:
+                    referencedColumnName: id
+            orphanRemoval: false
+        linkvalue:
+            targetEntity: N2item
+            cascade: {  }
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                linkvalue:
+                    referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks: {  }

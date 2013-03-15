@@ -1,0 +1,96 @@
+body {
+    padding: 0;
+    margin: 0;
+    spacing: 0;
+    padding-top: 60px;
+    padding-bottom: 10%;
+}
+
+.sorted a {
+    color: #999;
+    border-left: 2px solid #c33;
+}
+
+.breadcrumb .breadcrumb-input, span.breadcrumb-input input, .navbar-fixed-top select {
+    margin-bottom: 0 !important;
+}
+
+.breadcrumb .divider-vertical {
+    width: 30px;
+}
+
+.input-title, .page-title input {
+    font-size: 20px !important;
+    padding-top: 12px !important;
+    padding-bottom: 10px !important;
+    width: 65%;
+}
+
+.dropdown-menu li { display:block; }
+
+.dropdown-menu input {
+    display: inline-block;
+    float:right;
+}
+
+.nav-header strong {
+    font-size: 12px;
+}
+
+@media screen and (min-height: 0px) and (max-height: 300px) {
+    .subpages ul {
+	max-height: 100px;
+	overflow: auto;
+    }
+}
+@media screen and (min-height: 300px) and (max-height: 400px) {
+    .subpages ul {
+	max-height: 120px;
+	overflow: auto;
+    }
+}
+@media screen and (min-height: 400px) and (max-height: 500px) {
+    .subpages ul {
+	max-height: 150px;
+	overflow: auto;
+    }
+}
+@media screen and (min-height: 500px) and (max-height: 700px) {
+    .subpages ul {
+	max-height: 200px;
+	overflow: auto;
+    }
+}
+@media screen and (min-height: 700px) and (max-height: 900px) {
+    .subpages ul {
+	max-height: 300px;
+	overflow: auto;
+    }
+}
+@media screen and (min-height: 900px) {
+    .subpages ul {
+	max-height: 400px;
+	overflow: auto;
+    }
+}
+
+@media screen and (max-height: 550px) {
+    .navbar-fixed-top {
+	position: static;
+    }
+    body {
+	padding-top: 0;
+    }
+}
+
+.fwtxt { font-family: monospace,courier,fixed }
+.invisible { display:none; }
+.dropdown.dropdown-when-hover:hover > ul.dropdown-menu { display: block; }
+.btn-inverse > option { background: #333; color: white; }
+
+.attenuate { opacity:0.35; }
+.attenuate.select { opacity:1; }
+{# .attenuate:hover { opacity:1; } #}
+.attenuate:focus { opacity:1; }
+.attenuate:hover { opacity:1; }
+form.inlineform { margin: 0; min-height: 0; }

@@ -1,0 +1,8 @@
+{% spaceless %}
+<span class="backupform">
+    <span class="fwtxt">/{% for item in page.parents() %}<a href="{{ item.url.str() }}" title="{{ item.title }}">{{item.name}}</a>/{% endfor %}{% if page.canBeRenamed() %}{{forms.inline_row_breadcrumb(page.form.name)}}{% endif %}
+    </span>
+</span>
+{%endspaceless%}
+&nbsp; {#{{forms.inline_row(page.form.siblingtype)}}#}{{forms.crea({ submit:1, class:'strong' })}}
+&nbsp; {{forms.elimina({submit:1})}}

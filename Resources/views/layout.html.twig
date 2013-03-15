@@ -1,0 +1,22 @@
+{% import "UnislugN2Bundle::forms.html.twig" as forms %}
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>{% block title %}{{title}}{% endblock %}</title>
+      {% block headscripts %}{% endblock %}
+      {% block inlinecss %}
+      <style>
+	.userarea { float:right }
+	{% if inlinecss is defined %}{{inlinecss|raw}}{% endif %}
+      </style>
+      {% endblock %}
+    </head>
+    <body>
+      {% block body %}<div class=body>{% include "UnislugN2Bundle::loginbox.html.twig" %}{{body|raw}}</div>{% endblock %}
+      {% block inlinejs %}
+      <script>
+	{% if inlinejs is defined %}{{inlinejs|raw}}{% endif %}
+      </script>
+      {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,13 @@
+<li class=hideshow>
+  <!-- {{'Sottopagine'|trans}} -->
+  <div class="backupform subpages">
+    <ul class="contents sortable nav nav-list">
+      {% for item in l %}
+            <li data-itemid="{{item.id}}">{{ forms.theLink(item) }}
+      {% endfor %}
+    </ul>
+    <br class="clearfix" />
+    {{forms.crea({ href: page.url.set('action','add').str() })}}
+    <a id="reorder_subpages" class="btn button disabled" disable="disabled" title="{{'trascina.sottopagine'|trans}}" >{{'Riordina'|trans}}</a>
+  </div>
+</li>

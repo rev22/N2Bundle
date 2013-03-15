@@ -1,0 +1,6 @@
+{% extends "UnislugN2Bundle::layout.html.twig" %}
+{% block body %}
+<div>{% for item in page.parents() %}{{ forms.theLink(item) |raw}}» {% endfor %}</div>
+<h1>{{page.theTitle()}}</h1>
+<div><small>Children:</small> &middot; {% for item in page.children() %}{{ forms.theLink(item) |raw}} &middot; {% endfor %}</div>
+{% endblock %}

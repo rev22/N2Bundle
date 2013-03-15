@@ -1,0 +1,199 @@
+var setupforms;
+var cmsurl = new $.uri("{{page.cmsfullurl()|raw}}");
+
+console.log(".");
+
+(function() {
+    $.fn.dropleft = function () {
+	$(this).hover(function() {
+	    $(this).find('.dropdown-menu').css({ top:0, 'float': 'right', left: "-95%" }).stop(true, true).delay(300).fadeIn();
+	}, function() {
+	    $(this).find('.dropdown-menu').css({left: 0 }).stop(true, true).delay(500).fadeOut();
+	});
+    };
+    $.fn.backupforms = function () { $(this).each(function (i,e) { $(e).data("backup", $(e).html()); }).addClass("backedup"); return $(this); };
+    $.fn.restoreforms = function () { $(this).each(function (i,e) { $(e).html($(e).data("backup")); }).addClass("restored"); return $(this); };
+    $.fn.addReset = function() {
+	$(this).filter(":not(:has(.resetbutton))").each(function (i, e) {
+	    if (e.tagName != "SPAN") $(e).append(" ");
+	    $(e).append($("<span class=resetbutton><a class=\"btn btn-mini btn-info\">{{'Annulla'|trans}}</a></span>").click(function () {
+		$(this).parents(".inlineform").removeClass("standout");
+		$(this).parents(".backupform").restoreforms();
+		// $(this).remove();
+		setupforms();
+	    }));
+	});
+	return $(this);
+    };
+    $.fn.closeOnClick = function () { $(this).click(function(){ $(this).remove(); }); return $(this); };
+    // $.fn.makeFloat() = function () { $(this).click(function(){ $(this).remove(); }); return $(this); };
+    // $.fn.makeDraggable = function () { $(this).draggable().css({ position: 'absolute', 'z-index': 100}); };
+    $.fn.addCloseButton = function() {
+	$(this).filter(":not(:has(.closebutton))").each(function (i, e) {
+	    $(e).addClass("closable"); // .css({ position: 'absolute', 'z-index': 1000 });
+	    $(e).prepend($("<div class=closebutton style=\"padding-left:2em;float:right\"><a class=\"light btn\">&times;</a></div>").click(function () {
+		$(this).parents(".closable").remove();
+	    }));
+	});
+	return $(this);
+    };
+    $.fn.showFormError = function(x) {
+	$(this).filter(":not(:has(.formerror))").each(function (i, e) {
+	    $(e).prepend($("<div class=formerror>"+x+"</div>"));
+	});
+	return $(this);
+    };
+    $.fn.postFormAction = function(name, data, success) {
+	var $form = $(this);
+	var showerror = function(msg){ $form.showFormError("<small>"+msg+"</small>"); };
+	$.post(cmsurl.set('action', name), data, function (data, textStatus, j) {
+	    if (j.status == 202) {
+		$form.find(".inputmodified").removeClass("inputmodified sorted");
+    		$form.replaceClass("shine", "disabled");
+		success(data);
+	    } else {
+		showerror(j.responseText);
+	    }
+	}).fail(function(j,t,x){ showerror(j.responseText); });
+    };
+    $.fn.addEnabler = function() {
+	return $(this).each(function (i, e) {
+	var enabler = $("<input type=checkbox>").addClass("enabler");
+	    var $e = $(e);
+	    if (!$e.has(".enabler").length) {
+		$e.prepend(enabler);
+	    }
+	});
+    };
+    $.fn.replaceClass = function(a, b) {
+	$(this).find("."+a).removeClass(a).addClass(b);
+    };
+    $.fn.revealElements = function(a, b) {
+	$(this).find(".hidden").attr('style', '').removeClass("hidden").addClass("shine");
+    };
+})();
+
+window.setupforms = setupforms = function () {
+    console.log("setupforms+0");
+    var onmodify = function () {
+	$(this).addClass("inputmodified");
+	$(this).parents(".inlineform").addClass("standout").revealElements();
+	$(this).parents(".backupform").addReset(); // aggiungiAnnulla();
+    };
+    var $t = $("#form_transcandidate"); if ($t.val()) { $t.each(onmodify); };
+    $("input,select,textarea").change(onmodify);
+    $("input,textarea").on('input', onmodify);
+    console.log("setupforms-1");
+    {# jqueryui #}
+    $(".subchildren").filter(function(){ return $(this).children("li").length > 1; }).addClass("sortable");
+    console.log("setupforms-1.5");
+    $(".sortable")
+	//.each(function () { $(this).children("li:not(:has(.sorth))").append($("<span class=sorth>⇅</span>")); })
+	.sortable({
+	    update: function( event, ui ) {
+		$(this).parent(".subpages").revealElements();
+	    ui.item.parents(".sortable").parent().find("#reorder_subpages").removeClass("disable").removeAttr('disable'); {#.css({display:'block'});#}
+	    ui.item.addClass("inputmodified sorted");
+	    ui.item.parents(".backupform").addReset();
+	}
+	});
+    console.log("setupforms-2");
+
+    $(".subpages #reorder_subpages").click(function() {
+    	var $form = $(this).parent(".subpages");
+    	var l = $form.find("ul:first li").map(function (x) {
+    	    return $(this).attr("data-itemid");
+    	});
+	$form.find(".formerror").remove();
+	console.log(l);
+    	$form.postFormAction(
+	    "data:reorder-items",
+	    { seq: l.get().join('.') },
+	    function(data) { });
+    });
+    {# endif #}
+    console.log("setupforms-3");
+
+    $(".sortable").disableSelection();
+    $(".alert").closeOnClick(); // .addCloseButton() // .makeDraggable(); // .dialog(); 
+    // $(".restforms .form_row").addEnabler();
+
+    function choicemsg(sel, msg) { var opt = sel+" option"; $(opt).eq(0).text(msg); }
+    // choicemsg("#form_translation",      "   {{'Traduzioni'|trans}}");    
+    choicemsg("#form_transcandidate",   "{{'Collega traduzione'|trans}}");
+    choicemsg("#form_version",  "{{'Versioni precedenti'|trans}}");
+
+    $("#form_translation > option[value='']").remove();
+    $("#form_translation").on("change", function() { window.location = $(this).val(); });
+    // $("#form_transcandidate #choosetrans").click(function() { });
+    // $("#form_version").on("change", function() { window.location = $(this).val(); });
+    console.log("setupforms-0");
+};
+
+console.log("mid");
+
+{# if page.labjs().asked('tinymce') #}
+$().ready(function() {
+    var client_css = "{{ page.respath("/App_Themes/Client/Style.css") |raw}}";
+    var buttonline1 = "bold,italic,underline,formatremove,sub,sup,|,undo,redo,|,justifyleft,justifycenter,justifyright,justifyfull,formatselect,|,print,fullscreen";
+    var buttonline2 = "cut,copy,paste,pastetext,pasteword,|,bullist,numlist,indent,outdent,|,blockquote,link,unlink,anchor,image,|,cleanup,code";
+    $('textarea.tinymce').each(function () { $(this).tinymce({
+	// Location of TinyMCE script
+	script_url : '/tinymce/jscripts/tiny_mce/tiny_mce.js',
+	// General options
+	theme : "advanced",
+	language: "it",
+	plugins : "autolink,lists,pagebreak,style,layer,save,advhr,advimage,advlink,iespell,inlinepopups,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,advlist,autoresize",
+	// plugins : "autolink,lists,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,advlist",
+	// // Theme options
+	theme_advanced_buttons1: buttonline1,
+	theme_advanced_buttons2: buttonline2,
+	//theme_advanced_resizing: true,
+	//theme_advanced_resize_horizontal : false,
+	autoresize_min_height: "100px",
+	autoresize_max_height: "400px",
+	// height: "400px",
+	// content_css: client_css,
+	fullscreen_settings: {
+	    theme_advanced_buttons1: "bold,italic,underline,formatremove,sub,sup,|,undo,redo,|,justifyleft,justifycenter,justifyright,justifyfull,formatselect,|,|,cut,copy,paste,pastetext,pasteword,|,bullist,numlist,indent,outdent,|,blockquote,link,unlink,anchor,image,|,cleanup,code,|,|,print,fullscreen",
+	    theme_advanced_buttons2: ""
+	}
+    }); });
+    
+    $(function() {
+	$('.dropleft-when-hover').dropleft();
+    });
+
+    $(function() {
+	$('.attenuate').hover(function() {
+	    $(this).finish().css({ opacity: 1 });
+	}, function() {
+	    $(this).css({ opacity: 1 }).delay(3000).animate({ opacity: 0.35 }, 5000);
+	});
+    });
+
+    {#  tinymce.DOM.loadCSS(client_css); #}
+});
+
+console.log("3");
+
+{# endif #}
+setupforms();
+
+console.log("end");
+
+{####
+    $(".sortable").sortable({
+        update: function(event, ui) {
+            ui.item.addClass('sorted');
+            $('#btn-reorder').attr({ disabled: false });
+        },
+        items: "li:not(.nav-header)"
+    });
+####}
+// $('select').removeClass("invisible").selectpicker();
+
+;$(function() {
+    $(".backupform").backupforms();
+});
+

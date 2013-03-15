@@ -1,0 +1,2 @@
+#!/bin/sh
+exec git --git-dir /home/rev/dev/N2Bundle/.git/ --work-tree "$(dirname "$0")" "$@"

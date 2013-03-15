@@ -1,0 +1,92 @@
+N2item:
+    type: entity
+    table: n2Item
+    fields:
+        id:
+            id: true
+            type: integer
+            unsigned: false
+            nullable: false
+            generator:
+                strategy: IDENTITY
+        type:
+            type: string
+            length: 255
+            fixed: false
+            nullable: false
+        created:
+            type: datetime
+            nullable: false
+        published:
+            type: datetime
+            nullable: true
+        updated:
+            type: datetime
+            nullable: false
+        expires:
+            type: datetime
+            nullable: true
+        name:
+            type: string
+            length: 255
+            fixed: false
+            nullable: true
+        zonename:
+            type: string
+            length: 50
+            fixed: false
+            nullable: true
+        title:
+            type: string
+            length: 255
+            fixed: false
+            nullable: true
+        sortorder:
+            type: integer
+            unsigned: false
+            nullable: false
+        visible:
+            type: boolean
+            nullable: false
+        savedby:
+            type: string
+            length: 50
+            fixed: false
+            nullable: true
+        state:
+            type: integer
+            unsigned: false
+            nullable: true
+        ancestraltrail:
+            type: string
+            length: 100
+            fixed: false
+            nullable: true
+        versionindex:
+            type: integer
+            unsigned: false
+            nullable: true
+        alteredpermissions:
+            type: integer
+            unsigned: false
+            nullable: true
+    manyToOne:
+        parentid:
+            targetEntity: N2item
+            cascade: {  }
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                parentid:
+                    referencedColumnName: id
+            orphanRemoval: false
+        versionofid:
+            targetEntity: N2item
+            cascade: {  }
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                versionofid:
+                    referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks: {  }

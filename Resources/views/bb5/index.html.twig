@@ -1,0 +1,242 @@
+{% import "UnislugN2Bundle::forms.html.twig" as forms %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{page.theAction()}}: {{page.title}}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="{{ asset('libraries/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+	{### Already included
+        <link href="{{ asset('libraries/bootstrap-responsive.min.css') }}" rel="stylesheet" media="screen">        
+        <link href="{{ asset('libraries/bootstrap-select.min.css') }}" rel="stylesheet" media="screen">
+	###}
+        <style type="text/css">{% include "UnislugN2Bundle:bb5:backend.css.twig" %}</style>
+    </head>
+    <body>
+
+        <!-- Menu -->
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    {% if page.siteTitle is defined %}<a class="brand" href="{{page.root.viewUrl}}">{#<i class="icon-home"></i>#}{{page.siteTitle}}<sup>Beta</sup></a>{% endif %}
+		    <a class="btn btn-inverse pull-right" href="#">{{'Accedi'|trans}}</a>
+                    <span class="dropdown nav">
+                        <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">{#<i class="icon-cog">#}</i>{{'Crea'|trans}} <b class="caret"></b></button>
+                        <ul class="dropdown-menu" role="menu">
+			    {% for t in page.siteContents %}
+			    <li>{{t.theCreationLink()|raw}}</li>  
+			    {% endfor %}
+                        </ul>
+                    </span>
+                    {# <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">{{'Contenuti'|trans}}</button> #}
+                    <ul class="nav">
+			{% for t in page.siteContents %}
+			<li>{{t.theNavbarEntry()|raw}}</li>
+			{% endfor %}
+                    </ul>
+			
+		    {####
+                    <div class="nav-collapse collapse">
+                        <!-- Parte sinistra -->
+                        <!-- Parte destra -->
+
+                        <div class="navbar-form pull-right">
+			    <select>
+			    </select>
+			    { ####
+			    {% if page.form.version is defined %}<span class="span1 navbar-text 	   backupform inlineform">{{forms.inline_row(page.form.version)}}<a id="showversion" class="btn btn-navbar" href="javascript:window.location=$('#form_version').val()" title="{{'show.version.help'|trans}}" >{{'show.version'|trans}}</a></span>{% endif %}
+			    {% if page.form.transcandidate is defined %}<span class="span1 navbar-text   backupform inlineform">{{forms.inline_row(page.form.transcandidate)}}<input id="choosetrans" class="btn btn-navbar hidden" type="submit" name="action[choosetrans]" value="{{'Collega traduzione'|trans}}" title="{{'scegli.traduzione'|trans}}" ></span>{% endif %}
+			    {% if page.form.translation is defined %}<span class="span1 navbar-text      backupform inlineform visiturl">{{forms.inline_row(page.form.translation)}}<a id="showtrans" href="javascript:window.location=$('#form_translation').val()" class="btn btn-navbar hidden" title="{{'visita.traduzione'|trans}}">{{'Apri'|trans}}<a/></span>{% endif %}#### }
+                        </div>
+                    </div><!--/.nav-collapse -->
+		    ####}
+                </div>
+            </div>
+        </div>
+
+            <!-- Contenuto -->
+            
+        <div class="container-fluid">
+                                
+	    <div class="row-fluid">
+		{% set showsidepane = (not page.hideChildrenPane()) %}
+                <!-- Colonna sinistra -->
+
+		{% if showsidepane %}
+                <div class="span3">
+
+                    <div>
+
+                        <!-- Pagine -->
+                        {#<h4>Sottopagine</h4>#}
+			<div class="backupform subpages">
+			    <ul class="contents sortable nav nav-list">
+				{% for item in page.children %}
+				<li data-itemid="{{item.id}}">{{ forms.theLink(item) }}
+				    {% endfor %}
+			    </ul>
+			    {#### <br class="clearfix" />
+			    {{forms.crea({ href: page.url.set('action','add').str() })}}###}
+			    <a id="reorder_subpages" class="btn button hidden" disable="disabled" title="{{'trascina.sottopagine'|trans}}" >{{'Riordina'|trans}}</a>
+			</div>
+
+                        {#<hr />#}
+
+                        <!-- Oggetti -->
+			{% set childrentypes = page.presentChildrenTypes %}
+			<div id="childrentypes" class="backupform subpages accordion attenuate">
+			    {% for childrentype in childrentypes %}
+			    <div class="accordion-group">
+				<div class="accordion-heading accordion-toggle" data-toggle="collapse" data-parent="#childrentypes" href="#collapse-{{childrentype}}">
+				    {{(childrentype ~ ".type")|trans}}</div>
+				<ul id="collapse-{{childrentype}}" class="contents sortable nav nav-list accordion-body collapse">
+				    
+				    {% for item in page.children(childrentype) %}
+				    <li>{{ forms.theLink(item) }}</li>
+				    {% endfor %}
+				</ul>
+			    </div>
+			    {% endfor %}
+			</div>
+			
+			{% if childrentypes %}
+			{####
+                        <h4>{{'typed.subitems'|trans}}</h4>
+			<ul class="hideshow nav nav-list">
+			    {% for childrentype in childrentypes %}
+                            <li class="backupform nav-header"><strong>{{childrentype|trans}}</strong>
+	     			<ul class="nav nav-list sortable">
+                                    
+
+				</ul>
+			    </li>
+			    {% endfor %}
+			</ul>
+			####}
+			{% endif %}
+                    </div>
+
+                </div>
+		{% endif %}
+
+                <!-- Colonna destra (FORM) -->
+                <div class="span{{ showsidepane ? 9 : 12 }}">
+
+		    <!-- Errori e messaggi -->
+		    {% if page.postmessage is not empty %}<div class="alert alert-block">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			{{page.postmessage|raw}}</div>{% endif %}
+
+		    <!-- Traduzioni e versioni -->
+		    <div class="well well-small">
+		    <div class="row-fluid attenuate form-inline" style="margin-bottom:10px">
+			{% if page.form.version is defined %}{% set versions = page.form.version %}{% else %}{% set versions = null %}{% endif %}
+			<div class="span9">
+			    <div class="row-fluid">
+				<div class="span6 ">
+				    {####
+				    {{ page.contentLanguageControl|default('') |raw}}
+				    <div class="divider"></div>
+				    {{ page.contentUserControl|default('') |raw}}###}
+				    {% if page.form.translation is defined %}
+				    <div class="inlineform backupform visiturl row-fluid">{{form_widget(page.form.translation, { attr: { class: "btn span12" } })}}</div>
+				    {% endif %}
+				</div>
+				<div class="span6">
+				    {% if page.form.transcandidate is defined %}
+				    {###<form class="row-fluid backupform inlineform">{{forms.inline_row(page.form.transcandidate)}}<input id="choosetrans" class="btn btn-navbar hidden" type="submit" name="action[choosetrans]" value="{{'Collega traduzione'|trans}}" title="{{'scegli.traduzione'|trans}}" ></form>###}
+				    <form class="row-fluid backupform inlineform" {{form_enctype(page.form)}} method="post">{{form_widget(page.form.transcandidate, { attr: { class: "btn span12" } } )}}<input id="choosetrans" class="btn btn-navbar hidden" style="display:none" type="submit" name="action[choosetrans]" value="{{'Collega traduzione'|trans}}" title="{{'scegli.traduzione'|trans}}" ></form>
+				    {% endif %}
+				</div>
+			    </div>
+			</div>
+			{% if versions %}
+			<div class="span3">
+			    <div class="row-fluid backupform visiturl inlineform">
+				{{form_widget(versions, { attr: { class: "btn span12" } })}}
+				<a id="showversion" class="btn btn-small hidden" href="javascript:window.location=$('#form_version').val()" title="{{'show.version.help'|trans}}" >{{'show.version'|trans}}</a>
+			    </div>
+			</div>
+			{% endif %}
+		    </div>
+
+		    <!-- Breadcrumb -->
+		    {% if page.canShowBreadcrumb() %}
+		    <div class="row-fluid">
+			<div class="span12 backupform">
+			    <span class="backupform">
+				{% set parents = page.parents() %}
+				<a href="{{ parents[0].url }}" class=btn><i class=icon-home></i>{{ parents[0].name }}</a> <span class="fwtxt">/ {% for item in parents[1:] %}<a href="{{ item.url.str() }}" title="{{ item.title }}">{{item.name}}</a> / {% endfor %}{% if page.canBeRenamed() %}{{forms.inline_row_breadcrumb(page.form.name)}}{% endif %}
+				</span>
+			    </span>
+			    {#{% include "UnislugN2Bundle::breadcrumb.html.twig" %}#}
+			</div>
+		    </div>
+		    {% endif %}
+		    </div>
+
+                    <!-- FORM -->
+
+                    
+                    <!-- Titolo -->
+		    <span class="form-inline">
+			<span class="backupform inlineform">
+			    <span class="page-title">
+				{{form_widget(page.form.title, { attr: { class: 'input-medium' } })}}
+                            </span>
+			    <input id="settitle" class="hidden btn-primary" type="submit" value="{{'modifica.titolo'|trans}}" >
+			</span>
+			{% if page.viewUrl is defined %}<a href="{{page.viewUrl}}" style="display:inline-block">{{'Visita pagina'|trans}}</a>{% endif %}
+		    </span>
+
+		    {{form_errors(page.form)}}
+
+                    <!-- Editor -->
+		    {% if page.form.Text is defined %}{{forms.simple_row(page.form.Text, {'class': 'span12'})}}{% endif %}{#
+                    <textarea class="span8" rows="15"></textarea>#}
+                    
+		    {% if page.form.visible is defined %}{{forms.bool_row(page.form.visible)}}{% endif %}{#
+                    <label class="checkbox" for="form_visible" class="required">
+                        <input type="checkbox" id="form_visible" name="form[visible]" required="required" value="1" checked="checked"> Visibile
+                    </label>#}
+                    
+                    <hr />
+		    <div class="form-inline restforms">{{form_rest(page.form)}}</div>
+
+                    
+                    <div class="clearfix"></div>
+                    <hr />
+
+		    <div class="larger">
+			{% if page.hasVisibility() %}{{forms.button({ text:'Anteprima', help:"Mostra la pagina senza modificare il sito" })}}{% endif %}
+			{% if (page.form.visible is defined) or (not page.hasVisibility()) %}
+			{{forms.button({ text:'Salva', class:'strong btn-primary' })}}
+			{% else %}
+			{{forms.button({ text:'Pubblica', class:'strong' })}}
+			{% endif %}
+                            
+			{{forms.button({ text:'Annulla', href: page.url })}}
+                            
+		    </div>{#
+                    <button type="submit" class="btn btn-primary">Salva</button>
+                    <button class="btn">Anteprima</button>
+                    <button class="btn">Annulla</button>#}
+
+                </div>
+	    </div>
+        </div>
+
+
+
+        <script src="{{ asset('libraries/jquery-1.9.0.min.js') }}"></script>
+        <script src="{{ asset('libraries/jquery.ui-1.10.0.min.js') }}"></script>
+        <script src="{{ asset('libraries/bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ asset('libraries/jquery.uri-1.1.2.min.js') }}"></script>   
+        <script src="{{ asset('libraries/bootstrap-select/bootstrap-select.min.js') }}"></script>   
+        <script src="{{ asset('tinymce/jscripts/tiny_mce/jquery.tinymce.js') }}"></script>
+        <script type="text/javascript">{% include "UnislugN2Bundle:bb5:edit-page.js.twig" %}</script>
+    </body>
+</html>
+{# -*- sgml-basic-offset: 4 -*- #}

@@ -1,0 +1,288 @@
+{% extends "UnislugN2Bundle::layout.html.twig" %}
+
+{% form_theme page.form _self %}
+
+{% block form_label %}
+{% spaceless %}
+{% if not compound %}
+{% set label_attr = label_attr|merge({'for': id}) %}
+{% endif %}
+{% if required %}
+{% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+{% endif %}
+{% if label is empty %}
+{% set label = name|humanize %}
+{% endif %}
+<label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+{% endspaceless %}
+{% endblock form_label %}
+
+{% block form_row %}
+{% spaceless %}
+{% set type = 1 %}
+{% set has_form_rows = true %}
+<div class="form_row">
+  {{ form_label(form) }}
+  {{ form_errors(form) }}
+  {{ form_widget(form) }}
+</div>
+{% endspaceless %}
+{% endblock %}
+    
+{% block headscripts %}
+{% for s in page.registeredcss %}
+<link type="text/css" rel="stylesheet" href="{{s}}">
+{% endfor %}
+{#############
+{ ####
+{% set _ = page.registerScript("jquery",    "//ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js")     %}
+{% set _ = page.registerScript("jqueryui",  "//ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery-ui.min.js")  %}
+### }
+{% set _ = page.registerScript("jquery",    "http://code.jquery.com/jquery-1.9.1.js")         %}
+{% set _ = page.registerScript("jqueryui",  "http://code.jquery.com/ui/1.10.1/jquery-ui.js")  %}
+{% set _ = page.registerScript("jqueryform",  page.respath("jquery.form.js"))  %}
+{% for s in page.registeredscripts %}
+<script type="text/javascript" src="{{s}}"></script>
+{% endfor %}
+#############}
+{{ page.labjs().ask(['jqueryuri','jqueryui','jqueryform']).out() }}
+{% endblock headscripts %}
+
+{% block body %}
+<nav class=content style="float:left;width:15%;padding:0.5%;min-width:140px">
+  <ul class=accordion>
+    <li>
+      {{'Contenuti'|trans}}
+      <ul style="text-align:right" class="hidden autoshow">
+	{% for t in [ 'Utenti', 'Prodotti', 'News', 'Immagini', 'File', 'Lingue' ] %}
+	<li><a>{{t|trans}}</a> {{forms.crea()}}
+	{% endfor %}
+      </ul>
+    </li>
+    {% include "UnislugN2Bundle::subpages.html.twig" with { l: page.children } %}
+    {% set childrentypes = page.presentChildrenTypes %}
+    {% if childrentypes %}
+    {###
+    <li class=hideshow>
+      {{'typed.subitems'|trans}}
+      <ul style="text-align:right" class=hideshow>
+	###}
+	{% for childrentype in childrentypes %}
+	<li class=backupform>{{childrentype|trans}}
+	  <ul class="hidden autoshow sortable">
+	    {% for item in page.children(childrentype) %}<li>&middot; {{ forms.theLink(item) }}{% endfor %}
+	  </ul>
+	{% endfor %}{###
+      </ul>
+      ###}
+      {% endif %}
+    </li>
+  </ul>
+</nav>
+<div class=content style="float:right;width:83%;padding:0.5%;min-width:400px">
+  {% include "UnislugN2Bundle::loginbox.html.twig" %}
+  {% if not page.hasFixedLocation() %}
+  <div>{% include "UnislugN2Bundle::breadcrumb.html.twig" %}</div>
+  {% endif %}
+  {%set hr%}<div style="width:100%;clear:both;font-size:60%">&nbsp;</div>{%endset%}
+  {{hr}}
+  <div style="float:right;display:inline-block;text-align:right">
+  {% if page.form.translation is defined %}<div class="backupform inlineform visiturl">{{forms.inline_row(page.form.translation)}}<a id=showtrans href="javascript:window.location=$('#form_translation').val()" class="btn hidden" title="{{'visita.traduzione'|trans}}">{{'Apri'|trans}}<a/></div>{% endif %}
+  {% if page.form.transcandidate is defined %}<form class=subform {{form_enctype(page.form)}} method=post><div class="backupform inlineform">{{forms.inline_row(page.form.transcandidate)}}<input id=choosetrans class=hidden type=submit name="formaction[choosetrans]" value="{{'Collega traduzione'|trans}}" title="{{'scegli.traduzione'|trans}}" ></div></form>{% endif %}
+  {% if page.form.version is defined %}<div class="backupform inlineform">{{forms.inline_row(page.form.version)}}<a id=showversion class="btn hidden" href="javascript:window.location=$('#form_version').val()" title="{{'show.version.help'|trans}}" >{{'show.version'|trans}}</a></div>{% endif %}
+  </div>
+  <form class=titleform method="post" style="display:inline" {{form_enctype(page.form)}}>
+    <div>
+      <span class="backupform inlineform">
+	<h1 style="display:inline">{{form_widget(page.form.title)}}</h1>
+	<input id=choosetrans class=hidden type=submit value="{{'modifica.titolo'|trans}}" >
+      </span>
+      {% if page.viewUrl is defined %}<a style="display:inline-block" href="{{page.viewUrl}}">{{'Visita pagina'|trans}}</a>{% endif %}
+    </div>
+    <div>
+      {{hr}}
+      {% if page.postmessage is not empty %}<div class=message>{{page.postmessage|raw}}</div>{% endif %}
+      {{form_errors(page.form)}}
+      <div class=mainforms>
+	{% if page.form.Text is defined %}{{forms.simple_row(page.form.Text)}}{% endif %}
+	{% if page.form.visible is defined %}{{forms.bool_row(page.form.visible)}}{% endif %}
+      </div>
+      <div class=restforms>{{form_rest(page.form)}}</div>
+      <hr style="width:100%;clear:both">
+      <div class=larger>
+	{{forms.button({ text:'Annulla', href: page.url })}}
+	{% if page.hasVisibility() %}{{forms.button({ text:'Anteprima', help:"Mostra la pagina senza modificare il sito" })}}{% endif %}
+	{% if (page.form.visible is defined) or (not page.hasVisibility()) %}
+	{{forms.button({ text:'Salva', class:'strong' })}}
+	{% else %}
+	{{forms.button({ text:'Pubblica', class:'strong' })}}
+	{% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock body %}
+
+{% block inlinejs %}
+<script type="text/javascript">
+  $LAB.wait(function(){
+  console.log("loading main body js");
+  {% include "UnislugN2Bundle::edit-page.js.twig" %}
+  console.log("loaded main body js");
+  {% for s in page.registeredsnippets %}{{s|raw}}{% endfor %}
+  ;$(function() {
+  $(".backupform").backupforms();
+  });});
+</script>
+{% endblock %}
+
+{% block inlinecss %}
+<style type="text/css">
+h1 { font-size: 168%; }
+body {
+background-color: #aaa;
+border: 0; margin: 0; padding: 0;
+{# color: #eee; #}
+}
+input, select, textarea, button, .btn {
+{#width:100%;#}
+font-family:inherit;
+font-size: inherit;
+line-height: inherit;
+background-color:#ddd;
+}
+.content, .content div {
+{#background-color: #bbb;#}
+border: 0; margin: 0; padding: 0;
+}
+
+a {
+text-decoration: none;
+color: #005;
+}
+a:hover {
+text-decoration: none;
+background: #fff;
+}
+input[type="submit"], select, .btn {
+{#display: button;#}
+outline: #033 solid thin;
+border: 1px outset #ddd;
+background-color: #cdd;
+{#display: inline;#}
+cursor: default;
+margin: 0.04em;
+padding: 0.02em 0.2em;
+color: #000;
+line-height: normal;
+vertical-align: middle;
+}
+
+.btn.light {
+background:inherit;
+}
+
+nav ul {
+border: 1px inset #999;
+{#outline: black inset thin;#}
+}
+
+nav > ul > li {
+background: #888;
+}
+nav > ul > li > div, nav > ul > li > ul {
+background: #bbb;
+}
+
+input[type="submit"]:active, .btn:active {
+border: 1px inset #ddd;
+background-color: #aaa;
+}
+input:focus, input[type="submit"]:focus, select:focus, textarea:focus, button:focus, .btn:focus { background-color:#fff; }
+input:hover, input[type="submit"]:hover, select:hover, textarea:hover, button:hover, .btn:hover { background-color:#fff; }
+
+.strong { font-weight: bold }
+.fwtxt { font-family: monospace,courier,fixed }
+
+{% include "UnislugN2Bundle::accordion.css.twig" %}
+
+.sortable > * { cursor: move; border: 1px solid #bbb !important; overflow: auto; }
+.sortable .sorth { display:none; float: right; }
+.sortable *:hover .sorth { display:block; }
+.sortable > *:hover { border: 1px outset grey !important; box-shadow: 0 0 2px black; background-color: #ccc; }
+
+.resetbutton { line-height: 1.5; opacity: 0.75; }
+.resetbutton:focus, .resetbutton:hover { opacity: 1; }
+.inputmodified { background: #fd5; }
+.hidden { display: none; }
+.standout .shine { background: #ff9; }
+.standout {
+text-align:center;
+{#border: 1px inset #bbb !important;
+outline: #bbb outset thin;#}
+margin: 0.4em !important;
+padding: 0.4em !important;
+display:block;
+}
+{#.standout select, .standout input, .standout textarea { display:block; }#}
+.larger { font-size: 115%; }
+
+.disable, .disable.hover, .disable:active, input:disable {
+{#opacity: 0.6;#}
+color: #333;
+{#text-shadow: 1px 1px 1px white, 1px -1px -1px black;#}
+background-color: inherit !important;
+outline: #bbb solid 1px;
+outline: rgba(208, 208, 208, 0.5) outset 1px;
+border: 1px solid #bbb;
+}
+
+.form_row label {
+min-width: 140px !important;
+display: inline-block;
+}
+
+.restforms .form_row:hover {
+   background: #ddd;
+}
+
+// .mainforms { float:left; margin: 0 overflow:hidden }
+.restforms { float: right; }
+
+iframe:focus { width: 100%; }
+
+// .mceToolbar { display: none; }
+// .mceLayout:hover .mceToolbar { display: block; }
+// .mceLayout:focus .mceToolbar { display: block; width:100%; height:70% }
+
+.loginbox { float: right; }
+.titleform { display:inline-block; }
+
+.subpages li { overflow: hidden; }
+
+.formerror {
+color:#880;
+}
+.message, .content .message {
+margin: 0.1em 25%;
+padding: 0.5em 0.5em;
+text-align: center;
+font-size: 120%;
+border: 2px solid black;
+background: #FFA;
+}
+.message dl {
+text-align:left;
+}
+.formerror:hover {
+border: 1px solid blue;
+position: absolute;
+color: yellow;
+background: #004;
+background: rgba(0,0,140,0.5);
+z-index: 1000;
+padding: 1em;
+font-size: 120%;
+}
+</style>
+{% endblock inlinecss %}

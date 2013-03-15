@@ -1,0 +1,7 @@
+unislug_n2:
+    pattern:  /{path}
+    defaults:
+        _controller: UnislugN2Bundle:Path:index
+        path: ""
+    requirements:
+        path: ".*"

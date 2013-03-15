@@ -1,0 +1,13 @@
+{% spaceless %}
+<span class=loginbox>
+{% if page.user is defined %}
+
+{{'Hello, %name%'|trans({ name: page.user.name|trans  })}} | <a class=button href="?action=logout">{{'logout'|trans}}</a>
+
+{% else %}
+
+<a class=button href="?action=logout">{{'login'|trans}}</a> | <a class=button href="?action=register">{{'register'|trans}}</a>
+
+{% endif %}
+</span>
+{% endspaceless %}
